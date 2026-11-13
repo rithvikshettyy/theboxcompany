@@ -1,0 +1,168 @@
+/* CSS 3D corrugated box for the scroll intro. Colours come from the --box-* tokens in
+   globals.css. Only transform and opacity change per frame (written by Box3D.bindBox). */
+
+.box-scene {
+  position: absolute;
+  inset: 0;
+  contain: layout paint;
+  perspective: 1700px;
+  perspective-origin: 50% 40%;
+  pointer-events: none;
+  /* S = round(min(vw × 0.5, vh × 0.34, 340)); boxMath.boxSize mirrors this. */
+  --S: min(50vw, 34vh, 340px);
+  --S: round(nearest, min(50vw, 34vh, 340px), 1px);
+  --H: calc(var(--S) * 0.78);
+  --F: calc(var(--S) / 2);
+  /* Desktop: box sits right of the headline and drifts to centre as it folds. */
+  /* Phones: below the heading. Desktop: right of it, a little under centre. */
+  --shift: 0px;
+  --net-top: 62%;
+}
+@media (min-width: 1024px) {
+  .box-scene {
+    --shift: calc(15vw + 5px);
+    --net-top: 56%;
+  }
+}
+
+.box-net,
+.box-wall,
+.box-flap {
+  position: absolute;
+  transform-style: preserve-3d;
+}
+.box-net {
+  left: 50%;
+  top: var(--net-top);
+  width: var(--S);
+  height: var(--S);
+  margin: calc(var(--S) / -2) 0 0 calc(var(--S) / -2);
+  will-change: transform;
+}
+.box-base {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+/* Walls hinge on the base edges. W and E are 4px shorter so their flaps tuck under N and S. */
+.box-wall.n { left: 0; bottom: 100%; width: 100%; height: var(--H); transform-origin: 50% 100%; }
+.box-wall.s { left: 0; top: 100%; width: 100%; height: var(--H); transform-origin: 50% 0; }
+.box-wall.w { right: 100%; top: 0; width: calc(var(--H) - 4px); height: 100%; transform-origin: 100% 50%; }
+.box-wall.e { left: 100%; top: 0; width: calc(var(--H) - 4px); height: 100%; transform-origin: 0 50%; }
+
+.box-flap { --sh: 0; }
+.box-flap.n { left: 0; bottom: 100%; width: 100%; height: var(--F); transform-origin: 50% 100%; }
+.box-flap.s { left: 0; top: 100%; width: 100%; height: var(--F); transform-origin: 50% 0; }
+.box-flap.w { right: 100%; top: 0; width: var(--F); height: 100%; transform-origin: 100% 50%; }
+.box-flap.e { left: 100%; top: 0; width: var(--F); height: 100%; transform-origin: 0 50%; }
+
+/* Two layers per panel: liner inside, printed kraft outside. */
+.box-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+}
+.box-face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--night);
+  opacity: var(--sh, 0);
+  pointer-events: none;
+}
+.box-in {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--box-liner) 0,
+    var(--box-flute) 4px,
+    var(--box-liner) 8px
+  );
+  box-shadow: inset 0 0 0 1px var(--box-flute);
+}
+.box-out {
+  transform: rotateY(180deg);
+  color: var(--box-ink);
+  background: linear-gradient(180deg, var(--box-kraft), var(--box-kraft-edge));
+  box-shadow: inset 0 0 0 1px var(--box-kraft-edge);
+}
+/* Paper grain on a pseudo-element, so the box face is not an image and never becomes the
+   page's largest contentful paint (the headline is). */
+.box-out::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .2 0 0 0 0 .12 0 0 0 0 .05 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* Print. Sizes scale with the box. */
+.box-print {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--S) * 0.03);
+  font-family: var(--font-sans), sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
+}
+.box-print.upside { transform: rotate(180deg); }
+.box-print.cw { transform: rotate(90deg); }
+.box-print.ccw { transform: rotate(-90deg); }
+.box-wordmark {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--S) * 0.03);
+  font-family: var(--font-logo);
+  font-size: calc(var(--S) * 0.085);
+  letter-spacing: 0;
+  text-transform: none;
+}
+.box-small { font-size: calc(var(--S) * 0.038); }
+.box-stamp {
+  color: var(--box-stamp);
+  border: calc(var(--S) * 0.012) solid currentColor;
+  padding: calc(var(--S) * 0.015) calc(var(--S) * 0.04);
+  font-size: calc(var(--S) * 0.09);
+  transform: rotate(-8deg);
+}
+.box-tape {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: calc(var(--S) * 0.09);
+  background: var(--box-tape);
+  opacity: 0.85;
+}
+.box-tape.top { top: 0; }
+.box-tape.bottom { bottom: 0; }
+
+.box-ground {
+  position: absolute;
+  left: 50%;
+  top: var(--net-top);
+  width: calc(var(--S) * 1.9);
+  height: calc(var(--S) * 0.7);
+  margin: calc(var(--S) * 0.2) 0 0 calc(var(--S) * -0.95);
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--night) 60%, transparent), transparent);
+  translate: var(--shift) 0;
+}
+
+/* Off screen: drop the 3D layers entirely while the dashboard is in use. */
+.intro[data-offscreen="true"] .box-scene {
+  visibility: hidden;
+}
+
+/* Reduced motion: a static one-screen hero, box closed, no scroll story. */
+@media (prefers-reduced-motion: reduce) {
+  .intro {
+    height: 100svh;
+  }
+}

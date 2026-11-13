@@ -1,26 +1,257 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
+/* Dark only. The `dark` class sits on <html> so shadcn `dark:` variants apply. */
+@custom-variant dark (&:is(.dark *));
+
+/* ── Design tokens (CLAUDE.md §3). The only place raw hex is allowed. ── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #0c1d45;
+  --s1: #112555;
+  --s2: #172e63;
+  --line: #24417d;
+  --line2: #30528f;
+  --tx: #f5f8fc;
+  --mu: #aebfdd;
+  /* --mu2 and --brand3 are below 4.5:1 on every surface: non-text use only
+     (rules, gridlines, disabled fills). tests/tokens.test.ts guards this. */
+  --mu2: #6c86b8;
+  --brand: #e6eefa;
+  --brand2: #a3c6ff;
+  --brand3: #4d70b4;
+  --red: #ff8370;
+  --amber: #f0b44a;
+  --green: #7dd096;
+  --blue: #7ab0ff;
+
+  /* Cardboard for the intro box only (components/intro). Never used for UI or data. */
+  --box-liner: #dcc195;
+  --box-flute: #b9925f;
+  --box-kraft: #a8763f;
+  --box-kraft-edge: #8d6031;
+  --box-ink: #33200f;
+  --box-stamp: #8c2a1b;
+  --box-tape: #c9a06a;
+
+  /* Fixed regardless of theme: the intro's closing curtain and the text on it. */
+  --night: #0c1d45;
+  --paper: #f5f8fc;
+
+  /* shadcn/ui expects --radius; 8px keeps buttons and chips in the 6 to 8px band. */
+  --radius: 0.5rem;
+}
+
+/* Light theme (CLAUDE.md §3). The homepage switches between this and the dark default on scroll. */
+[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4f6f9;
+  --s1: #ffffff;
+  --s2: #e9eef4;
+  --line: #d6deea;
+  --line2: #bfccdc;
+  --tx: #0c1d45;
+  --mu: #465a80;
+  --mu2: #8494ab;
+  --brand: #0c1d45;
+  --brand2: #2457b3;
+  --brand3: #9db2d4;
+  --red: #c03a25;
+  --amber: #94600a;
+  --green: #1c7a43;
+  --blue: #2560c4;
+}
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* Dashboard sky: the gradient behind the header and hero, and the white-on-blue tokens used on it. */
+.dash-sky {
+  background: linear-gradient(180deg, #163c82 0%, #2c72c8 42%, #86c0ee 74%, var(--bg) 100%);
+}
+.on-sky {
+  --tx: #ffffff;
+  --mu: #dce9fb;
+  --s2: rgb(255 255 255 / 0.16);
+  --line: rgb(255 255 255 / 0.22);
+  --line2: rgb(255 255 255 / 0.4);
+  --brand: #ffffff;
+  --bg: #0c1d45;
+}
+
+/* Homepage: every palette token is a blend of its light and dark value. Surfaces follow --dark
+   (0 = light, 1 = dark), which ThemeScroll moves with the scroll, so the page changes exactly as
+   fast as the reader scrolls. Text and accents follow --ink, which flips over a short band of
+   --dark so they always contrast with the surface. tests/tokens.test.ts checks both palettes. */
+.theme-mix {
+  --dark: 0;
+  --ink: 0;
+  --bg: color-mix(in oklab, #f4f6f9, #0c1d45 calc(var(--dark) * 100%));
+  --s1: color-mix(in oklab, #ffffff, #112555 calc(var(--dark) * 100%));
+  --s2: color-mix(in oklab, #e9eef4, #172e63 calc(var(--dark) * 100%));
+  --line: color-mix(in oklab, #d6deea, #24417d calc(var(--dark) * 100%));
+  --line2: color-mix(in oklab, #bfccdc, #30528f calc(var(--dark) * 100%));
+  --tx: color-mix(in oklab, #0c1d45, #f5f8fc calc(var(--ink) * 100%));
+  --mu: color-mix(in oklab, #465a80, #aebfdd calc(var(--ink) * 100%));
+  --mu2: color-mix(in oklab, #8494ab, #6c86b8 calc(var(--ink) * 100%));
+  --brand: color-mix(in oklab, #0c1d45, #e6eefa calc(var(--ink) * 100%));
+  --brand2: color-mix(in oklab, #2457b3, #a3c6ff calc(var(--ink) * 100%));
+  --brand3: color-mix(in oklab, #9db2d4, #4d70b4 calc(var(--ink) * 100%));
+  --red: color-mix(in oklab, #c03a25, #ff8370 calc(var(--ink) * 100%));
+  --amber: color-mix(in oklab, #94600a, #f0b44a calc(var(--ink) * 100%));
+  --green: color-mix(in oklab, #1c7a43, #7dd096 calc(var(--ink) * 100%));
+  --blue: color-mix(in oklab, #2560c4, #7ab0ff calc(var(--ink) * 100%));
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Drop Tailwind's default palette so only tokens can be used. */
+  --color-*: initial;
+  --color-bg: var(--bg);
+  --color-s1: var(--s1);
+  --color-s2: var(--s2);
+  --color-line: var(--line);
+  --color-line2: var(--line2);
+  --color-tx: var(--tx);
+  --color-mu: var(--mu);
+  --color-mu2: var(--mu2);
+  --color-brand: var(--brand);
+  --color-brand2: var(--brand2);
+  --color-brand3: var(--brand3);
+  --color-red: var(--red);
+  --color-amber: var(--amber);
+  --color-green: var(--green);
+  --color-blue: var(--blue);
+  --color-night: var(--night);
+  --color-paper: var(--paper);
+
+  /* shadcn semantic names, mapped onto the tokens so copied components inherit the look. */
+  --color-background: var(--bg);
+  --color-foreground: var(--tx);
+  --color-card: var(--s1);
+  --color-card-foreground: var(--tx);
+  --color-popover: var(--s2);
+  --color-popover-foreground: var(--tx);
+  --color-primary: var(--brand);
+  --color-primary-foreground: var(--bg);
+  --color-secondary: var(--s2);
+  --color-secondary-foreground: var(--tx);
+  --color-muted: var(--s2);
+  --color-muted-foreground: var(--mu);
+  --color-accent: var(--s2);
+  --color-accent-foreground: var(--tx);
+  --color-destructive: var(--red);
+  --color-border: var(--line);
+  --color-input: var(--line2);
+  --color-ring: var(--brand2);
+
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  /* Expanded display face for headings; Poppins fills in glyphs it lacks (₹). */
+  --font-display: var(--font-archivo), var(--font-poppins), ui-sans-serif, sans-serif;
+  /* The logo is set in Helvetica wherever it is installed (Arial elsewhere). */
+  --font-logo: Helvetica, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", monospace;
+  --font-heading: var(--font-sans);
+
+  /* Type scale 11 / 12 / 13 / 15 / 20 / 26 / 42 / 72. T-shirt names so `cn` merges them correctly. */
+  --text-*: initial;
+  --text-2xs: 11px;
+  --text-2xs--line-height: 16px;
+  --text-xs: 12px;
+  --text-xs--line-height: 16px;
+  --text-sm: 13px;
+  --text-sm--line-height: 20px;
+  --text-base: 15px;
+  --text-base--line-height: 24px;
+  --text-lg: 20px;
+  --text-lg--line-height: 28px;
+  --text-xl: 26px;
+  --text-xl--line-height: 32px;
+  --text-2xl: 42px;
+  --text-2xl--line-height: 48px;
+  --text-3xl: 72px;
+  --text-3xl--line-height: 72px;
+
+  --radius-sm: calc(var(--radius) * 0.75);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius);
+  --radius-xl: 12px;
+  --radius-2xl: 14px;
+  --radius-chip: 8px;
+  --radius-panel: 12px;
+  --radius-card: 14px;
+
+  --shadow-card: 0 1px 2px color-mix(in srgb, var(--night) 6%, transparent), 0 12px 32px -16px color-mix(in srgb, var(--night) 22%, transparent);
+
+  --container-page: 1440px;
+
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@media (prefers-color-scheme: dark) {
+@utility surface-card {
+  background-image: linear-gradient(
+    180deg,
+    var(--s1) 0%,
+    color-mix(in srgb, var(--s1) 70%, var(--bg)) 100%
+  );
+}
+
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    color-scheme: dark;
+  }
+  * {
+    @apply border-border;
+  }
+  html {
+    @apply font-sans;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-bg text-sm text-tx antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid var(--brand2);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--brand) 40%, transparent);
+    color: var(--tx);
+  }
+  [id] {
+    scroll-margin-top: 16px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* Every number in data: tabular figures in the body face, so columns line up (CLAUDE.md §3). */
+  .num {
+    @apply tabular-nums;
+  }
+  /* Display headings: Archivo at full width (stand-in for an expanded face like Akira). */
+  .display {
+    font-family: var(--font-display);
+    font-stretch: 125%;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+  /* Section label: 12px uppercase, 0.12em tracking, brand2. */
+  .section-label {
+    @apply text-xs font-medium tracking-[0.12em] text-brand2 uppercase;
+  }
+}
+
+/*
+ * React Bits FlexCarousel (vendored). Its box is overflow hidden with overscroll contained, which
+ * swallows vertical wheel and touch scrolling; let the page scroll through it. Token focus ring.
+ */
+.services-carousel.flex-carousel {
+  overscroll-behavior: auto;
+}
+.services-carousel.flex-carousel:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--brand2);
 }
