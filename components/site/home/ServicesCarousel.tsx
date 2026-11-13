@@ -63,7 +63,7 @@ export function ServicesCarousel() {
   }
 
   return (
-    <div ref={ref} className="h-[30rem] text-tx md:h-[38rem]">
+    <div ref={ref} className="h-[34rem] text-tx md:h-[38rem]">
       {mode === "gl" ? (
         <FlexCarousel
           items={ITEMS}

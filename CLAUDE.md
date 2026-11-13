@@ -32,7 +32,7 @@ Claude Code reads this file automatically at the start of every session. It hold
 
 ```
 app/
-  page.tsx                 company homepage: HomeHero (live GlimmerVale meadow), "How a box is made" (BoxIntro scroll story), what we make, why us, careers teaser
+  page.tsx                 company homepage: HomeHero (live GlimmerVale meadow), "How a box is made" (BoxIntro scroll story), what we do (services carousel), what we make, why us, careers teaser
   about/ products/ careers/ contact/   company site pages (content from lib/company.ts)
   dashboard/layout.tsx     header (views sub-nav, scope tabs on Overview and Production), providers
   dashboard/page.tsx       Overview: ₹ leak, waterfall, line flow, fix first, KPIs, causes, heatmap, deckle, orders, simulator
@@ -43,6 +43,7 @@ components/
   charts/                  Waterfall, Pareto, DecklePlanner, Heatmap, Sparkline
   site/                    SitePage (header, theme blend, footer), Section, ContactForm, MobileMenu, home/ sections. No invented customers, figures or claims; placeholders live in lib/company.ts
   originkit/               vendored Originkit components (GlimmerVale), kept as shipped; excluded from source-style tests
+  reactbits/               vendored React Bits components (FlexCarousel.jsx + .css, WebGL2 via ogl), kept as shipped; typed by FlexCarousel.d.ts
   intro/                   BoxIntro (box scroll story, section 2 of the homepage), HeroBackdrop (GlimmerVale meadow for HomeHero, lazy, mounted only while on screen), Box3D (CSS 3D box), useScrollProgress, boxMath (pure, tested)
   dashboard/               DashboardView, HeroLeak, FixFirst, LineFlow, KpiTile, OrderTable, Simulator, ScopeTabs
   ops/                     operations views (Stats: PageIntro, StatRow, Tag) and their parts
@@ -161,7 +162,7 @@ Copy components in, then restyle them to the tokens. Do not ship the default loo
 | Industrial texture | Dither or halftone image exported as static WebP | Ditther / ASCIInator |
 | Heatmap reveal | `stagger` with grid option | Anime.js |
 
-- Allow one "wow" effect per page, and only on the intro screen.
+- Allow one "wow" effect per page, and only on the intro screen. Exception (owner request, 2026-11-14): the homepage services section uses React Bits FlexCarousel (`components/site/home/ServicesCarousel.tsx`), mounted only near the viewport, with a static grid fallback without WebGL2. Its drawings live in `public/services/` and hold no text; captions are DOM.
 - Lazy-load WebGL with `next/dynamic` and `ssr:false`, and fall back to a static image if WebGL fails.
 - Install a library component only when a prompt asks for it. No speculative installs.
 
