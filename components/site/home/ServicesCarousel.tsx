@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import type { FlexCarouselItem } from "@/components/reactbits/FlexCarousel";
 import { SERVICES } from "@/lib/company";
 
-/** React Bits FlexCarousel (WebGL2, ogl): loaded in the browser only, once the section is near. */
+/** React Bits FlexCarousel (WebGL2, ogl): loaded in the browser only, while the section is on screen. */
 const FlexCarousel = dynamic(() => import("@/components/reactbits/FlexCarousel"), {
   ssr: false,
   loading: () => null,
@@ -35,13 +35,19 @@ export function ServicesCarousel() {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    let gl: boolean | null = null;
+    // Mounted while the section is on screen, so the cards deal in and start moving by themselves as
+    // the reader scrolls down to it, and the WebGL canvas is released again when they scroll away.
     const io = new IntersectionObserver(
       ([e]) => {
-        if (!e.isIntersecting) return;
-        io.disconnect();
-        setMode(hasWebGL2() ? "gl" : "static");
+        if (!e.isIntersecting) {
+          setMode((m) => (m === "static" ? m : "idle"));
+          return;
+        }
+        gl ??= hasWebGL2();
+        setMode(gl ? "gl" : "static");
       },
-      { rootMargin: "300px 0px" },
+      { rootMargin: "120px 0px", threshold: 0.15 },
     );
     io.observe(el);
     return () => io.disconnect();
@@ -74,6 +80,8 @@ export function ServicesCarousel() {
           gap={16}
           radius={14}
           captureWheel={false}
+          autoplay
+          interval={3.5}
           className="services-carousel"
         />
       ) : null}

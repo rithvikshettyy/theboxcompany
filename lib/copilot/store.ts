@@ -37,7 +37,9 @@ const newId = () => `d_${Date.now().toString(36)}${Math.random().toString(36).sl
 
 async function buildChunks(id: string, name: string, pages: Page[]): Promise<Chunk[]> {
   const raw = chunkPages(pages);
-  const vecs = await embedTexts(raw.map((c) => c.text));
+  // The file name goes in front of each chunk when it is embedded (not in the stored text), so a question that names the topic finds that document.
+  const title = name.replace(/\.[a-z0-9]+$/i, "").replace(/^Sample - /i, "");
+  const vecs = await embedTexts(raw.map((c) => `${title}. ${c.text}`));
   return raw.map((c, i) => ({
     id: `${id}:${c.index}`,
     docId: id,

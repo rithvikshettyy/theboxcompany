@@ -24,10 +24,6 @@ export function ServicesSection() {
       <div className="mt-10">
         <ServicesCarousel />
       </div>
-      <p className="mx-auto mt-4 max-w-5xl px-5 text-sm text-mu md:px-8">
-        <span className="md:hidden">Swipe to browse. Tap a drawing to enlarge it.</span>
-        <span className="hidden md:inline">Drag, or focus the row and use the arrow keys. Click a drawing to enlarge it.</span>
-      </p>
       <ul className="sr-only">
         {SERVICES.map((s) => (
           <li key={s.title}>

@@ -7,7 +7,7 @@ export async function POST() {
   const added = [];
   try {
     for (const s of SAMPLE_DOCS.filter((x) => !have.has(x.name))) {
-      added.push(await addDocument({ name: s.name, kind: "txt", sizeBytes: s.pages.reduce((n, p) => n + p.text.length, 0), pages: s.pages, sample: true }));
+      added.push(await addDocument({ name: s.name, kind: s.kind ?? "txt", sizeBytes: s.pages.reduce((n, p) => n + p.text.length, 0), pages: s.pages, sample: true }));
     }
     return Response.json({ docs: added }, { status: 201 });
   } catch (e) {

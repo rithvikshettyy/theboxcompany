@@ -35,6 +35,12 @@ export const SITE_DOCS: Doc[] = [
     ]),
   },
   {
+    name: "Plant and machines overview",
+    pages: p([
+      `The demonstration plant (synthetic). One plant, one line: a corrugator (reel stand, single facer, double backer, slitter-scorer, cut-off and stacker) feeding a converting line (Printer-slotter, Folder-gluer, Bundler). The corrugator works across a ${P.deckleMm} mm deckle at a rated ${P.ratedSpeed} m/min. The Printer-slotter, rated ${P.psBoxesPerHour} boxes an hour, is the constraint machine. The plant runs ${SHIFT_PATTERN}. The factory manuals, SOPs, quality limits, safety rules, supplier specifications and the October breakdown log are in the Factory Copilot knowledge base: use "Add demo documents" there, then ask about them.`,
+    ]),
+  },
+  {
     name: "Careers",
     pages: p([`Jobs and careers at The Box Company. Which job roles are open: these vacancies are placeholders until the real openings are set. ${ROLES.map((r) => `${r.title}, ${r.team}, ${r.shift}: ${r.body}`).join("\n")}\nThe plant runs ${SHIFT_PATTERN}.`]),
   },

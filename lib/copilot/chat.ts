@@ -20,7 +20,10 @@ export type ChatRequest = {
 /** Answer when the website documentation does not cover the question. */
 export const SITE_NO_ANSWER = "I couldn't find that in the website documentation. Try rephrasing, or open the Factory Copilot to search your own uploaded documents.";
 
-export const llmConfigured = (): boolean => !!process.env.ANTHROPIC_API_KEY;
+export type Provider = "anthropic" | "gemini" | "demo";
+/** Which AI model answers: Claude if ANTHROPIC_API_KEY is set, else Gemini if GEMINI_API_KEY is set, else demo mode. */
+export const provider = (): Provider => (process.env.ANTHROPIC_API_KEY ? "anthropic" : process.env.GEMINI_API_KEY ? "gemini" : "demo");
+export const llmConfigured = (): boolean => provider() !== "demo";
 
 const CITE = /\[(\d+)\]/g;
 /** Numbers an answer cites that really are among the retrieved sources. */
@@ -101,11 +104,52 @@ async function* streamClaude(messages: ChatMessage[], signal?: AbortSignal): Asy
   }
 }
 
+/** Stream a Gemini answer. Throws a plain-language Error if the service fails. */
+async function* streamGemini(messages: ChatMessage[], signal?: AbortSignal): AsyncGenerator<string> {
+  const model = process.env.COPILOT_MODEL ?? COPILOT.geminiModel;
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`, {
+    method: "POST",
+    signal,
+    headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY ?? "" },
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: SYSTEM }] },
+      contents: messages.map((m) => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] })),
+      generationConfig: { maxOutputTokens: COPILOT.maxTokens },
+    }),
+  });
+  if (!res.ok || !res.body) throw new Error(`The AI service returned ${res.status}. Check the Gemini API key and try again.`);
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buf = "";
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, { stream: true });
+    let nl: number;
+    while ((nl = buf.indexOf("\n")) >= 0) {
+      const line = buf.slice(0, nl).trim();
+      buf = buf.slice(nl + 1);
+      if (!line.startsWith("data:")) continue;
+      try {
+        const ev = JSON.parse(line.slice(5)) as { candidates?: { content?: { parts?: { text?: string }[] } }[]; error?: { message?: string } };
+        if (ev.error) throw new Error(ev.error.message ?? "The AI service reported an error.");
+        for (const part of ev.candidates?.[0]?.content?.parts ?? []) if (part.text) yield part.text;
+      } catch (e) {
+        if (e instanceof SyntaxError) continue;
+        throw e;
+      }
+    }
+  }
+}
+
+/** The configured provider's stream. */
+const streamLlm = (messages: ChatMessage[], signal?: AbortSignal) => (provider() === "gemini" ? streamGemini(messages, signal) : streamClaude(messages, signal));
+
 /**
  * One chat turn as a stream of events: the retrieved sources first, then the answer, then a summary.
  * With no passages above the threshold the answer is the fixed refusal and the model is never called.
  */
-export async function* chat(req: ChatRequest, llm: (messages: ChatMessage[], signal?: AbortSignal) => AsyncGenerator<string> = streamClaude, signal?: AbortSignal): AsyncGenerator<StreamEvent> {
+export async function* chat(req: ChatRequest, llm: (messages: ChatMessage[], signal?: AbortSignal) => AsyncGenerator<string> = streamLlm, signal?: AbortSignal): AsyncGenerator<StreamEvent> {
   const data = req.kb === "site" ? siteData() : load();
   const noAnswer = req.kb === "site" ? SITE_NO_ANSWER : COPILOT.noAnswer;
   const mode = llmConfigured() ? "llm" : "demo";

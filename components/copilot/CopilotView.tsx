@@ -40,7 +40,7 @@ export function CopilotView() {
     { id: "ask", label: "Ask", icon: MessageSquare },
     { id: "kb", label: `Knowledge base${status ? ` (${status.docs})` : ""}`, icon: BookOpen },
   ];
-  const demo = status?.llm !== "anthropic";
+  const demo = status?.llm === "demo" || !status;
 
   return (
     <main id="main" className="grid w-full grid-cols-12 gap-4 px-5 pt-4 pb-24 md:px-8 lg:gap-6 lg:px-10">
@@ -51,7 +51,7 @@ export function CopilotView() {
         <p className="min-w-0 flex-1 text-mu">
           {status ? (
             demo ? (
-              <><strong className="font-medium text-tx">Demo mode.</strong> No AI model is connected (set <code className="text-tx">ANTHROPIC_API_KEY</code> on the server). Search is real: it finds the matching passages in your documents and quotes them with their pages. It does not write or summarise answers. Search uses a local keyword embedding ({status.embedder}), not a cloud model.</>
+              <><strong className="font-medium text-tx">Demo mode.</strong> No AI model is connected (set <code className="text-tx">GEMINI_API_KEY</code> or <code className="text-tx">ANTHROPIC_API_KEY</code> in <code className="text-tx">.env.local</code> and restart). Search is real: it finds the matching passages in your documents and quotes them with their pages. It does not write or summarise answers. Search uses a local keyword embedding ({status.embedder}), not a cloud model.</>
             ) : (
               <><strong className="font-medium text-tx">Connected to {status.model}.</strong> Answers are written only from retrieved passages, with citations. Search embedding: {status.embedder}. {status.chunks} passages from {status.docs} documents are indexed.</>
             )

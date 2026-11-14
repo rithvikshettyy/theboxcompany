@@ -1,6 +1,6 @@
 import { connection } from "next/server";
 import { COPILOT } from "@/lib/assumptions";
-import { llmConfigured } from "@/lib/copilot/chat";
+import { provider } from "@/lib/copilot/chat";
 import { embedderId } from "@/lib/copilot/embed";
 import { load } from "@/lib/copilot/store";
 
@@ -9,8 +9,8 @@ export async function GET() {
   await connection();
   const d = load();
   return Response.json({
-    llm: llmConfigured() ? "anthropic" : "demo",
-    model: llmConfigured() ? (process.env.COPILOT_MODEL ?? COPILOT.model) : null,
+    llm: provider(),
+    model: provider() === "demo" ? null : (process.env.COPILOT_MODEL ?? (provider() === "gemini" ? COPILOT.geminiModel : COPILOT.model)),
     embedder: embedderId(),
     docs: d.docs.length,
     chunks: d.chunks.length,

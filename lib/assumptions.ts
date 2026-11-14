@@ -336,5 +336,7 @@ export const COPILOT = {
   /** Answer when the documents do not cover the question. Fixed wording, never rephrased. */
   noAnswer: "I couldn't find sufficient information in the uploaded factory documents to answer this reliably.",
   model: "claude-sonnet-5-5",
+  /** Default Gemini model when GEMINI_API_KEY is set. Override with COPILOT_MODEL. */
+  geminiModel: "gemini-2.5-flash",
   maxTokens: 1200,
 } as const;

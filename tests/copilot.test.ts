@@ -76,7 +76,7 @@ const docxXml = (paras: string[]) =>
   `<?xml version="1.0"?><w:document><w:body>${paras.map((p) => (p === "PAGEBREAK" ? '<w:p><w:r><w:br w:type="page"/></w:r></w:p>' : `<w:p><w:r><w:t>${p}</w:t></w:r></w:p>`)).join("")}</w:body></w:document>`;
 
 async function seedSamples() {
-  for (const s of SAMPLE_DOCS) await addDocument({ name: s.name, kind: "txt", sizeBytes: 1, pages: s.pages, sample: true });
+  for (const s of SAMPLE_DOCS) await addDocument({ name: s.name, kind: s.kind ?? "txt", sizeBytes: 1, pages: s.pages, sample: true });
 }
 async function run(question: string, extra: Partial<Parameters<typeof chat>[0]> = {}, llm?: Parameters<typeof chat>[1]): Promise<StreamEvent[]> {
   const out: StreamEvent[] = [];
@@ -209,7 +209,7 @@ describe("retrieval and citations", () => {
     expect((await retrieve(q, d.chunks, { embedder: d.embedder, topK: 1 })).length).toBe(1);
     expect((await retrieve(q, d.chunks, { embedder: d.embedder, topK: 10, threshold: 0.99 })).length).toBe(0);
     const one = d.docs.find((x) => x.name.includes("Single facer"))!;
-    const filtered = await retrieve(q, d.chunks, { embedder: d.embedder, topK: 10, docIds: [one.id] });
+    const filtered = await retrieve(q, d.chunks, { embedder: d.embedder, topK: 10, threshold: 0.05, docIds: [one.id] });
     expect(filtered.length).toBeGreaterThan(0);
     expect(filtered.every((h) => h.chunk.docId === one.id)).toBe(true);
     expect(toSources(await retrieve(q, d.chunks, { embedder: d.embedder }), q).length).toBeLessThanOrEqual(COPILOT.topK);

@@ -1,4 +1,4 @@
-import type { Page } from "./types";
+import { FACTORY_KB, type KbDoc } from "./factoryKb";
 
 /**
  * DEMO DOCUMENTS. Short, made-up examples so the Copilot can be tried before real manuals are
@@ -7,7 +7,7 @@ import type { Page } from "./types";
  */
 const NOTE = "SAMPLE DOCUMENT FOR DEMONSTRATION ONLY. Not a real procedure or specification.";
 
-export const SAMPLE_DOCS: { name: string; pages: Page[] }[] = [
+const CORE: KbDoc[] = [
   {
     name: "Sample - Corrugator troubleshooting guide.txt",
     pages: [
@@ -54,6 +54,13 @@ export const SAMPLE_DOCS: { name: string; pages: Page[] }[] = [
         page: 1,
         text: `${NOTE}\n\nFlute reference. B flute has a finer, flatter flute. It gives a smoother surface for printing and good crush resistance for its thickness. It is often used for retail boxes and packs of small items. C flute has a larger, taller flute. It gives better stacking strength and cushioning, and a thicker board. It is often used for shipping cartons.\nBC double wall combines a B and a C flute layer for heavy loads. Choose the flute from the product weight, the stacking height and the print quality needed.`,
       },
+      {
+        page: 2,
+        text: `Difference between B flute and C flute. B flute is about 3 mm tall and C flute is about 4 mm tall. B flute: flatter surface, better print quality, good crush resistance, used for retail boxes and small items. C flute: taller flute, better cushioning and stacking strength, thicker board, used for shipping cartons and heavier or fragile goods. The difference in height changes the board thickness, so a flute change on the corrugator is a changeover. E flute is finer than B and is used for fine print and small retail packs. BC double wall joins a B and a C layer for heavy loads and export.`,
+      },
     ],
   },
 ];
+
+/** Every demo document: the four short originals, then the wider synthetic factory knowledge base. */
+export const SAMPLE_DOCS: KbDoc[] = [...CORE, ...FACTORY_KB];

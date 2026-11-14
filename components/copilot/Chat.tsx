@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { AnswerText } from "./AnswerText";
 import { SourceCard } from "./SourceCard";
 
-export type Status = { llm: "anthropic" | "demo"; model: string | null; embedder: string; docs: number; chunks: number; defaults: { topK: number; topKMax: number; threshold: number } };
+export type Status = { llm: "anthropic" | "gemini" | "demo"; model: string | null; embedder: string; docs: number; chunks: number; defaults: { topK: number; topKMax: number; threshold: number } };
 
 const SUGGESTED = [
   "Why is our corrugator experiencing frequent paper breaks?",
