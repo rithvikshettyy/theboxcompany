@@ -54,7 +54,7 @@ export function ProductionCard({ className }: { className?: string }) {
               {days.map((d, i) => {
                 const isToday = i === days.length - 1;
                 return (
-                  <li key={d.label} className="relative flex h-full flex-1 items-end justify-center">
+                  <li key={`${d.label}-${i}`} className="relative flex h-full flex-1 items-end justify-center">
                     <span className={cn("w-1 rounded-full sm:w-1.5", isToday ? "bg-night" : "bg-line2")} style={{ height: `${(d.tons / top) * 100}%` }} />
                     {isToday ? (
                       <span className="absolute top-0 right-0 z-10 w-40 rounded-2xl bg-night p-3 text-paper shadow-card">
@@ -71,7 +71,7 @@ export function ProductionCard({ className }: { className?: string }) {
           <span />
           <ol aria-hidden="true" className="flex justify-between gap-1 text-2xs text-mu">
             {days.map((d, i) => (
-              <li key={d.label} className="flex-1 text-center">{i % 3 === 0 || i === days.length - 1 ? d.label : ""}</li>
+              <li key={`${d.label}-${i}`} className="flex-1 text-center">{i % 3 === 0 || i === days.length - 1 ? d.label : ""}</li>
             ))}
           </ol>
         </div>
@@ -85,7 +85,7 @@ export function ProductionCard({ className }: { className?: string }) {
       </p>
       <table className="sr-only">
         <caption>Good board by day, tonnes</caption>
-        <tbody>{days.map((d) => <tr key={d.label}><th scope="row">{d.label}</th><td>{wt(d.tons, 1)}</td></tr>)}</tbody>
+        <tbody>{days.map((d, i) => <tr key={`${d.label}-${i}`}><th scope="row">{d.label}</th><td>{wt(d.tons, 1)}</td></tr>)}</tbody>
       </table>
     </section>
   );

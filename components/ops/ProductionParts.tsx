@@ -22,8 +22,8 @@ export function DailyChart({ days, target }: { days: { label: string; tons: numb
           <span className="absolute -top-5 right-0 text-xs text-mu tabular-nums">Target {wt(target)}</span>
         </span>
         <ol className="flex h-full items-end gap-1 sm:gap-2">
-          {days.map((d) => (
-            <li key={d.label} className="flex h-full flex-1 flex-col justify-end">
+          {days.map((d, i) => (
+            <li key={`${d.label}-${i}`} className="flex h-full flex-1 flex-col justify-end">
               <span
                 title={`${d.label}: ${wt(d.tons, 1)}`}
                 className={cn("block rounded-t-sm", d.tons >= target ? "bg-green" : "bg-brand")}
@@ -35,7 +35,7 @@ export function DailyChart({ days, target }: { days: { label: string; tons: numb
       </div>
       <ol aria-hidden="true" className="flex gap-1 text-center text-2xs text-mu sm:gap-2">
         {days.map((d, i) => (
-          <li key={d.label} className="flex-1 truncate">
+          <li key={`${d.label}-${i}`} className="flex-1 truncate">
             {i % 2 === days.length % 2 || d.label === "Today" ? d.label : ""}
           </li>
         ))}
@@ -43,8 +43,8 @@ export function DailyChart({ days, target }: { days: { label: string; tons: numb
       <table className="sr-only">
         <caption>Good board by day, tonnes</caption>
         <tbody>
-          {days.map((d) => (
-            <tr key={d.label}>
+          {days.map((d, i) => (
+            <tr key={`${d.label}-${i}`}>
               <th scope="row">{d.label}</th>
               <td>{wt(d.tons, 1)}</td>
             </tr>
