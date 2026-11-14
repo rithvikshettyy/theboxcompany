@@ -803,13 +803,10 @@ const FlexCarousel = ({
 
       if (
         s.autoplay &&
-        !reducedMotion &&
         introState.done &&
         focus.target === 0 &&
         focus.t < 0.01 &&
-        !pointer.over &&
         !pointer.down &&
-        !hasFocus &&
         mode === 'spring' &&
         Math.abs(goal - pos) < 1 &&
         now - interactedAt > 3000 &&
@@ -818,7 +815,7 @@ const FlexCarousel = ({
         autoplayAt = now;
         step(m, 1);
       }
-      if (s.autoplay && !reducedMotion) animating = true;
+      if (s.autoplay) animating = true;
 
       const travel = Math.abs(pos - lastPos) / dt;
       lastPos = pos;

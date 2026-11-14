@@ -36,16 +36,15 @@ export function ServicesCarousel() {
     const el = ref.current;
     if (!el) return;
     let gl: boolean | null = null;
-    // Mounted while the section is on screen, so the cards deal in and start moving by themselves as
-    // the reader scrolls down to it, and the WebGL canvas is released again when they scroll away.
+    // Mounted the first time the section nears the screen, so the cards deal in as the reader gets
+    // there. It then stays mounted, so autoplay keeps running no matter how the page is scrolled
+    // (the carousel itself pauses drawing while off screen).
     const io = new IntersectionObserver(
       ([e]) => {
-        if (!e.isIntersecting) {
-          setMode((m) => (m === "static" ? m : "idle"));
-          return;
-        }
+        if (!e.isIntersecting) return;
         gl ??= hasWebGL2();
         setMode(gl ? "gl" : "static");
+        io.disconnect();
       },
       { rootMargin: "120px 0px", threshold: 0.15 },
     );
