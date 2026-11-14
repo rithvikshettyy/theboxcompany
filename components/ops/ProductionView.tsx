@@ -8,7 +8,7 @@ import { ChartSkeleton } from "@/components/ui/chart-skeleton";
 import { Insight } from "@/components/ui/insight";
 import { Term } from "@/components/ui/term";
 import { OPS, P } from "@/lib/assumptions";
-import { inr, num, pct } from "@/lib/format";
+import { inr, num, pct, wt, wtParts } from "@/lib/format";
 import { dailyTonnes, production, type Production } from "@/lib/ops";
 import { SCOPE_LABEL } from "@/lib/scope";
 import { PREVIOUS_LABEL } from "@/lib/story";
@@ -21,11 +21,11 @@ function stats(p: Production, d: PlantData, prev: string): Stat[] {
   return [
     {
       label: "Production",
-      value: num(p.tons),
-      unit: "t",
+      value: wtParts(p.tons).amount,
+      unit: wtParts(p.tons).unit,
       progress: p.ofTarget,
       tone: toneFor(p.ofTarget * 100, 100, "higher", 5),
-      note: `${num(p.goodM2)} m² · ${pct(p.ofTarget * 100, 0)} of ${num(p.targetTons)} t target · ${num(p.tons - p.previousTons, 1)} t vs ${prev}`,
+      note: `${num(p.goodM2)} m² · ${pct(p.ofTarget * 100, 0)} of ${wt(p.targetTons)} target · ${wt(p.tons - p.previousTons, 1)} vs ${prev}`,
     },
     {
       label: "Wastage",

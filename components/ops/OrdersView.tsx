@@ -5,6 +5,7 @@ import { inr, num, pct } from "@/lib/format";
 import { orders } from "@/lib/ops";
 import { STAGES } from "@/lib/records";
 import { cn } from "@/lib/utils";
+import { OrdersManager } from "@/components/planner/OrdersManager";
 import { PageIntro, StatRow, Tag, td, th, toneFor } from "./Stats";
 
 const SHIP: Record<string, { tone: "good" | "watch" | "loss"; label: string }> = {
@@ -32,6 +33,8 @@ export function OrdersView() {
           { label: "Low-margin orders", value: o.lowMargin.length, tone: o.lowMargin.length ? "loss" : "good", note: `Below the ${OPS.marginFloorPct}% margin floor` },
         ]}
       />
+
+      <OrdersManager />
 
       <Card id="ready" title="Dispatch readiness" subtitle="Orders due out today and how far each has got." className="col-span-12 xl:col-span-7">
         <div className="-mx-5 overflow-x-auto px-5 md:mx-0 md:px-0">

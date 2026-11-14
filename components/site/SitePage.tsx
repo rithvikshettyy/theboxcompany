@@ -27,12 +27,12 @@ export function SitePage({
  * Opening block of an inner page: one big heading and a short lede, light. It fills most of the
  * first screen so the next section (and its theme) starts below the fold.
  */
-export function PageHero({ title, lede }: { title: string; lede: string }) {
+export function PageHero({ title, lede, position = "end" }: { title: string; lede: string; position?: "end" | "center" }) {
   return (
     <section
       aria-labelledby="page-title"
       data-section-theme="light"
-      className="mx-auto flex min-h-[88svh] w-full max-w-5xl flex-col justify-end px-5 pt-40 pb-24 md:px-8"
+      className={`mx-auto flex min-h-[88svh] w-full max-w-5xl flex-col items-center text-center px-5 pt-40 pb-24 md:px-8 ${position === "center" ? "justify-center" : "justify-end"}`}
     >
       <h1 id="page-title" className="display max-w-[16ch] text-2xl text-balance text-tx md:text-3xl">
         {title}

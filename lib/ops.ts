@@ -52,11 +52,17 @@ export function production(d: PlantData) {
 export type Production = ReturnType<typeof production>;
 
 /** Good board in tonnes for each of the last `days` working days, oldest first. */
+const dailyCache = new Map<number, { label: string; tons: number }[]>();
 export function dailyTonnes(days = 14): { label: string; tons: number }[] {
-  return Array.from({ length: days }, (_, i) => days - 1 - i).map((day) => ({
+  // Deterministic, and called on every render of the production charts, so it is worked out once.
+  const hit = dailyCache.get(days);
+  if (hit) return hit;
+  const out = Array.from({ length: days }, (_, i) => days - 1 - i).map((day) => ({
     label: workingDayLabel(day),
     tons: tonnes(SHIFT_IDS.reduce((s, sh) => s + calc(shiftParams(day, sh).params).goodM2, 0)),
   }));
+  dailyCache.set(days, out);
+  return out;
 }
 
 /* ── Materials ──────────────────────────────────────────────────────────── */

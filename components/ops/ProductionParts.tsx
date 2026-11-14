@@ -1,6 +1,6 @@
 import { Insight } from "@/components/ui/insight";
 import { OPS } from "@/lib/assumptions";
-import { inr, num, pct } from "@/lib/format";
+import { inr, num, pct, wt } from "@/lib/format";
 import type { Production } from "@/lib/ops";
 import { cn } from "@/lib/utils";
 import type { PlantData } from "@/lib/types";
@@ -19,13 +19,13 @@ export function DailyChart({ days, target }: { days: { label: string; tons: numb
           className="absolute inset-x-0 border-t-2 border-dashed border-mu"
           style={{ bottom: `${(target / top) * 100}%` }}
         >
-          <span className="absolute -top-5 right-0 text-xs text-mu tabular-nums">Target {num(target)} t</span>
+          <span className="absolute -top-5 right-0 text-xs text-mu tabular-nums">Target {wt(target)}</span>
         </span>
         <ol className="flex h-full items-end gap-1 sm:gap-2">
           {days.map((d) => (
             <li key={d.label} className="flex h-full flex-1 flex-col justify-end">
               <span
-                title={`${d.label}: ${num(d.tons, 1)} t`}
+                title={`${d.label}: ${wt(d.tons, 1)}`}
                 className={cn("block rounded-t-sm", d.tons >= target ? "bg-green" : "bg-brand")}
                 style={{ height: `${(d.tons / top) * 100}%` }}
               />
@@ -46,13 +46,13 @@ export function DailyChart({ days, target }: { days: { label: string; tons: numb
           {days.map((d) => (
             <tr key={d.label}>
               <th scope="row">{d.label}</th>
-              <td>{num(d.tons, 1)} t</td>
+              <td>{wt(d.tons, 1)}</td>
             </tr>
           ))}
         </tbody>
       </table>
       <Insight tone={hit === 0 ? "loss" : "watch"}>
-        {`The plant hit its ${num(target)} t target on ${hit} of the last ${days.length} days, averaging ${num(avg)} t: ${num(target - avg)} t a day short.`}
+        {`The plant hit its ${wt(target)} target on ${hit} of the last ${days.length} days, averaging ${wt(avg)}: ${wt(target - avg)} a day short.`}
       </Insight>
     </>
   );
@@ -79,7 +79,7 @@ export function WasteSplit({ p, d }: { p: Production; d: PlantData }) {
               <span className="block h-full rounded-full bg-red" style={{ width: `${(r.pctValue / total) * 100}%` }} />
             </span>
             <p className="col-span-2 text-xs text-mu tabular-nums">
-              {num(r.tons, 1)} t of board · {inr(r.rupees)} lost
+              {wt(r.tons, 1)} of board · {inr(r.rupees)} lost
             </p>
           </li>
         ))}

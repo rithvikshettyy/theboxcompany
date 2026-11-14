@@ -46,6 +46,8 @@ components/
   reactbits/               vendored React Bits components (FlexCarousel.jsx + .css, WebGL2 via ogl), kept as shipped; typed by FlexCarousel.d.ts
   intro/                   BoxIntro (box scroll story, section 2 of the homepage), HeroBackdrop (GlimmerVale meadow for HomeHero, lazy, mounted only while on screen), Box3D (CSS 3D box), useScrollProgress, boxMath (pure, tested)
   dashboard/               DashboardView, HeroLeak, FixFirst, LineFlow, KpiTile, OrderTable, Simulator, ScopeTabs
+  copilot/                 Factory Copilot (/dashboard/copilot): Chat, KnowledgeBase, SourceCard. Talks to /api/copilot/*; shows demo mode until ANTHROPIC_API_KEY is set
+  planner/                 Production Planner (/dashboard/planner): Timeline (Gantt, drag and drop), OrderTable, OrderForm, WhatIfPanel, PlannerInsights, ExportBar. UI only; all scheduling lives in lib/planner/
   ops/                     operations views (Stats: PageIntro, StatRow, Tag) and their parts
   ui/                      shadcn + copied library components (restyled)
 lib/
@@ -53,6 +55,8 @@ lib/
   model.ts                 pure functions: build(scope), calc(params), recs(), trim optimiser
   format.ts                inr(), num(), pct()
   ops.ts                   production, materials, quality and orders figures (pure, tested)
+  copilot/                 RAG: extract (PDF via unpdf, DOCX, TXT, CSV), chunk (overlap, page-exact), embed (local hash, or OpenAI if OPENAI_API_KEY), store (JSON file in .data/, swap for a vector DB), retrieve (top-k, threshold, doc filter), chat (stream, refusal sentence, Claude if ANTHROPIC_API_KEY). Documents are untrusted data: scanned, escaped, tagged. Tests in tests/copilot.test.ts
+  planner/                 scheduling engine (engine.ts heuristic, calendar, rules, metrics, insights, whatif, moves, validate, export, store, sample demo data). Pure and tested (tests/planner.test.ts). A heuristic, not an optimiser; demo data is labelled as such
   records.ts               sample plant records: reel stock, vendors, tests, dispatch, quotes (replace with ERP data)
   viz.ts                   chart helpers (waterfall bars, Pareto 80%, plan clock, trends)
   types.ts

@@ -10,6 +10,7 @@ export default function ContactPage() {
   return (
     <SitePage cta={{ title: "See how the plant is running", href: "/dashboard", label: "Open the dashboard" }}>
       <PageHero
+        position="center"
         title="Tell us what you ship"
         lede="Send the product, its size and how many you need a month. We reply with a board recommendation and a price."
       />

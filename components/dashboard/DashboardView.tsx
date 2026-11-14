@@ -5,11 +5,12 @@ import { WaterfallSection } from "@/components/charts/Waterfall";
 import { KpiTiles } from "./KpiTiles";
 import { LineFlow } from "./LineFlow";
 import { OrderTable } from "./OrderTable";
+import { ActionCentre } from "./overview/ActionCentre";
 import { AttentionCard } from "./overview/AttentionCard";
-import { FixCard } from "./overview/FixCard";
 import { FocusCards } from "./overview/FocusCards";
 import { OverviewHero } from "./overview/OverviewHero";
 import { ProductionCard } from "./overview/ProductionCard";
+import { ShiftIntelligence } from "./overview/ShiftIntelligence";
 import { Simulator } from "./Simulator";
 import { SimulatorProvider } from "./SimulatorProvider";
 
@@ -27,8 +28,10 @@ export function DashboardView() {
           <FocusCards className="col-span-12 xl:col-span-5" />
           <ProductionCard className="col-span-12 xl:col-span-7" />
 
-          <FixCard className="col-span-12 xl:col-span-5" />
-          <AttentionCard className="col-span-12 xl:col-span-7" />
+          <ActionCentre className="col-span-12" />
+
+          <ShiftIntelligence className="col-span-12 xl:col-span-7" />
+          <AttentionCard className="col-span-12 xl:col-span-5" />
 
           <WaterfallSection className="col-span-12 xl:col-span-7" />
           <ParetoSection className="col-span-12 xl:col-span-5" />

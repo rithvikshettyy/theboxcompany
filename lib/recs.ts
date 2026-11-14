@@ -46,6 +46,7 @@ export function recsCalc(scope: Scope, base: ShiftParams, days: ShiftDay[], trim
   const recs: Omit<Rec, "perMonth">[] = [
     {
       id: "trim",
+      problem: `Trim is ${pct(base.trimPct)} of the board against a ${pct(TARGET.trimPct)} target. The planned runs leave the web part empty.`,
       title: `Re-plan corrugator runs to cut trim from ${pct(base.trimPct)} to ${pct(trimTo)}`,
       body: "Pair orders of the same flute so they fill more of the web. The deckle planner shows the better pairing for every run.",
       owner: "Planning",
@@ -56,6 +57,7 @@ export function recsCalc(scope: Scope, base: ShiftParams, days: ShiftDay[], trim
     },
     {
       id: "reels",
+      problem: `Shift ${reels.shift} loses ${num(reels.minutes)} min a shift waiting for paper reels (target ${TARGET.reelWaitMin} min).`,
       title: `Stage reels before Shift ${reels.shift} starts`,
       body: `Shift ${reels.shift} loses ${num(reels.minutes)} min a shift waiting for paper reels. Have the outgoing crew stage the first three hours of reels before ${String(SHIFT_START_HOUR[reels.shift]).padStart(2, "0")}:00.`,
       owner: "Stores",
@@ -66,6 +68,7 @@ export function recsCalc(scope: Scope, base: ShiftParams, days: ShiftDay[], trim
     },
     {
       id: "smed",
+      problem: `Printer-Slotter changeovers take ${num(base.psChangeoverMin)} min a shift against a ${TARGET.psChangeoverMin} min target. It is the plant's constraint.`,
       title: `Cut Printer-Slotter changeovers from ${num(base.psChangeoverMin)} to ${TARGET.psChangeoverMin} min a shift`,
       body: "Mount plates and mix ink off-line while the last order runs. The Printer-Slotter is the constraint, so every minute saved is extra boxes out of the plant.",
       owner: "Converting",
@@ -76,6 +79,7 @@ export function recsCalc(scope: Scope, base: ShiftParams, days: ShiftDay[], trim
     },
     {
       id: "rejects",
+      problem: `Rejects run at ${pct(base.rejectPct)} against a ${pct(TARGET.rejectPct)} target.`,
       title: "Check glue and steam at every shift start",
       body: `Rejects run at ${pct(base.rejectPct)} against a ${pct(TARGET.rejectPct)} target, mostly warp and weak bonding. A 10-minute check on glue viscosity and steam pressure catches them.`,
       owner: "Quality",

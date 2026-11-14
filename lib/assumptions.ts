@@ -57,7 +57,7 @@ export const P = {
    * there is a minute of box output lost for the whole plant.
    */
   boxMargin: 1.6,
-  /** One truckload of board, m² (about 9 t at 0.5 kg/m²). Makes m² tangible. */
+  /** One truckload of board, m² (about 10 t at the 0.56 kg/m² board weight below). Makes m² tangible. */
   truckM2: 18_000,
 } as const;
 
@@ -66,9 +66,8 @@ export const MONTHS_PER_YEAR = 12;
 /** ₹ lost per m² of trim or reject: the margin never earned plus paper not won back as scrap. */
 export const WASTE_PER_M2 = P.marginPerM2 + P.paperPerM2 * (1 - P.scrapRecovery);
 
-/** What good looks like. KPI status and recommendation presets use these. */
-export const TARGET = {
-  oee: 70,
+/** Component targets. The OEE target is not typed in: it is what these produce together. */
+const TARGET_PARTS = {
   availability: 85,
   speed: 135,
   trimPct: 3,
@@ -79,10 +78,31 @@ export const TARGET = {
   reelWaitMin: 8,
 } as const;
 
+/**
+ * OEE target = availability × performance × quality, each at its own target. Performance is target
+ * speed over rated speed; quality is what is left after trim, then rejects (the model's definition).
+ * One source for the number, so the OEE tile and the component tiles can never disagree.
+ */
+const OEE_TARGET =
+  Math.round(
+    (TARGET_PARTS.availability / 100) *
+      (TARGET_PARTS.speed / P.ratedSpeed) *
+      (1 - TARGET_PARTS.trimPct / 100) *
+      (1 - TARGET_PARTS.rejectPct / 100) *
+      1000,
+  ) / 10;
+
+/** What good looks like. KPI status and recommendation presets use these. */
+export const TARGET = { oee: OEE_TARGET, ...TARGET_PARTS } as const;
+
 /** Production and materials targets for the operations views. */
 export const OPS = {
-  /** Good board the plant plans to make a day, m². */
-  dailyTargetM2: 250_000,
+  /**
+   * Good board the plant plans to make a day, m²: rated output for three shifts at the OEE target,
+   * to the nearest 1,000. Derived, so the production plan and the OEE target are the same promise.
+   */
+  dailyTargetM2:
+    Math.round((P.ratedSpeed * (P.deckleMm / 1000) * P.shiftMin * P.shiftsPerDay * TARGET.oee) / 100 / 1000) * 1000,
   /** Average board weight across the 3-ply and 5-ply mix, kg per m². Converts m² to tonnes. */
   boardKgPerM2: 0.56,
   /** Total waste target: side trim plus dry-end rejects, % of gross board. */
@@ -260,5 +280,61 @@ export const PLAN_RUNS: readonly { id: string; reelMm: number; meters: number; o
   { id: "R8", reelMm: 1700, meters: 11_400, orders: [{ id: "SO-4829", outs: 2 }] },
 ];
 
-/** UI timing. The header clock only shows minutes, so a 15 s tick is plenty. */
-export const CLOCK_TICK_MS = 15_000;
+/**
+ * Production planner constants. The planner schedules converting machines against orders; its
+ * rules are a heuristic, not an optimiser (see lib/planner/engine.ts).
+ */
+export const PLANNER = {
+  /** How far ahead the scheduler looks for machine time, days. Work that does not fit is flagged. */
+  horizonDays: 28,
+  /** Plant clock is a fixed UTC offset (India has no daylight saving), hours. */
+  istOffsetH: 5.5,
+  /** Allowance for trim and set-up waste when turning order m² into paper. */
+  paperAllowance: 1.06,
+  /** Glue flap added to the blank length, mm. */
+  glueFlapMm: 35,
+  /** Hours an order's deadline is pulled in (urgent) or pushed out (low) when ranking. Not the real deadline. */
+  priorityBiasH: { urgent: 16, high: 8, normal: 0, low: -8 },
+  /** An order finishing within this many hours of its deadline is "at risk". */
+  riskBufferH: 4,
+  /** Set-up for the first job on a machine, minutes. */
+  firstSetupMin: 15,
+  /** Changeover minutes added between two jobs for each thing that differs. */
+  changeoverMin: { grade: 10, flute: 20, printColour: 35, printPlates: 20, size: 15 },
+  /** Blank sizes closer than this (mm) count as the same size. */
+  sizeToleranceMm: 5,
+  /** Idle hours on a machine before it is worth a mention. */
+  idleNoteH: 8,
+  /** Overload below this many % over capacity is not worth a mention. */
+  overloadNotePct: 3,
+  /** A regrouping must save at least this many changeover minutes to be suggested. */
+  groupingNoteMin: 15,
+  /** Minutes in an hour, for readability where durations are minutes. */
+  minPerHour: 60,
+} as const;
+
+/** Factory Copilot (RAG) settings. Defaults for retrieval and ingestion; the chat panel can change topK and the threshold. */
+export const COPILOT = {
+  /** Target characters per chunk and the overlap carried into the next chunk, so a step is never cut off from its context. */
+  chunkChars: 700,
+  overlapChars: 140,
+  /** Chunks sent to the model, and the least similarity a chunk needs to count as evidence. */
+  topK: 5,
+  topKMax: 10,
+  threshold: 0.12,
+  /** Local embedding size (hashed words and word pairs). */
+  embedDims: 1024,
+  /** Upload limits. */
+  maxFileBytes: 10 * 1024 * 1024,
+  maxPages: 400,
+  maxZipInflateBytes: 25 * 1024 * 1024,
+  /** Chat limits. */
+  maxQuestionChars: 2000,
+  maxHistoryTurns: 6,
+  /** Largest excerpt shown on a citation card, characters. */
+  excerptChars: 320,
+  /** Answer when the documents do not cover the question. Fixed wording, never rephrased. */
+  noAnswer: "I couldn't find sufficient information in the uploaded factory documents to answer this reliably.",
+  model: "claude-sonnet-5-5",
+  maxTokens: 1200,
+} as const;

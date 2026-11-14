@@ -14,9 +14,10 @@ import { SpeedPill } from "./SpeedPill";
  * clock. The shift and period tabs appear only on views that follow them.
  */
 export function Header() {
-  const scoped = SCOPED.has(usePathname());
+  const path = usePathname();
+  const scoped = SCOPED.has(path);
   return (
-    <header className="on-sky">
+    <header className="on-sky no-print">
       <div className="flex min-h-20 w-full items-center gap-x-6 px-5 md:px-8 lg:px-10">
         <Link href="/" className="flex min-h-11 items-center">
           <Wordmark className="text-base whitespace-nowrap min-[380px]:text-lg md:text-xl" />
@@ -27,9 +28,9 @@ export function Header() {
           <LiveClock />
         </div>
       </div>
-      <div className={cn("flex flex-col gap-2 px-5 pb-3 md:px-8 lg:px-10", !scoped && "xl:hidden")}>
+      <div className={cn("flex flex-col gap-4 px-5 pt-2 pb-6 md:px-8 lg:px-10", !scoped && "xl:hidden")}>
         <DashNav className="-mx-5 overflow-x-auto px-5 md:mx-0 md:px-0 xl:hidden" />
-        {scoped ? <ScopeTabs /> : <p className="text-xs text-mu xl:hidden">Stock, quality and orders as of 06:00 today.</p>}
+        {scoped ? <ScopeTabs /> : <p className="text-xs text-mu xl:hidden">{path === "/dashboard/planner" ? "Plans the converting machines from the orders you enter." : path === "/dashboard/copilot" ? "Answers from your uploaded factory documents." : "Stock, quality and orders as of 06:00 today."}</p>}
       </div>
     </header>
   );

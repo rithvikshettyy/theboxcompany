@@ -6,8 +6,9 @@ import { Insight } from "@/components/ui/insight";
 import { Term } from "@/components/ui/term";
 import { usePlant } from "@/components/dashboard/PlantProvider";
 import { WithPlant } from "@/components/dashboard/WithPlant";
-import { ORDERS, P, TARGET } from "@/lib/assumptions";
-import { num, pct } from "@/lib/format";
+import { ORDERS, P, TARGET, WASTE_PER_M2 } from "@/lib/assumptions";
+import { inr, num, pct, wt } from "@/lib/format";
+import { trimSavings } from "@/lib/trim";
 import { cn } from "@/lib/utils";
 import type { Combo, TrimPlan } from "@/lib/types";
 
@@ -42,6 +43,28 @@ function story(t: TrimPlan): string {
   return `Re-pairing orders cuts trim from ${pct(t.plannedPct)} to ${pct(t.bestPct)} of the paper on today's runs. The biggest wins are runs that use one order alone on a wide reel.`;
 }
 
+/** Before and after for the plan's runs: trim, paper saved, ₹ recovered. */
+function Outcome({ plan }: { plan: TrimPlan }) {
+  const s = trimSavings(plan);
+  const cells = [
+    { label: "Trim, before", value: pct(plan.plannedPct), tone: trimTone(plan.plannedPct) },
+    { label: "Trim, after", value: pct(plan.bestPct), tone: trimTone(plan.bestPct) },
+    { label: "Paper saved", value: `${num(s.savedM2)} m²`, note: wt(s.savedKg / 1000, 1), tone: "text-tx" },
+    { label: "₹ recovered a day", value: inr(s.rupeesPerDay), note: "on these runs", tone: "text-green" },
+  ];
+  return (
+    <dl className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      {cells.map((c) => (
+        <div key={c.label} className="rounded-2xl bg-s2/70 p-4">
+          <dt className="text-xs text-mu">{c.label}</dt>
+          <dd className={cn("mt-1 text-xl tabular-nums", c.tone)}>{c.value}</dd>
+          {c.note ? <dd className="text-xs text-mu tabular-nums">{c.note}</dd> : null}
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 /** The planner's run against the best combination, run by run. */
 export function DecklePlanner({ className }: { className?: string }) {
   const plant = usePlant();
@@ -65,6 +88,7 @@ export function DecklePlanner({ className }: { className?: string }) {
       <WithPlant plant={plant} fallback={<ChartSkeleton variant="rows" className="h-56" />}>
         {(d) => (
           <>
+            <Outcome plan={d.trim} />
             <ul className="flex flex-col">
               {d.trim.runs.map((r) => (
                 <li key={r.id} className="flex flex-col gap-1.5 border-t border-line py-3 first:border-t-0">
@@ -72,7 +96,12 @@ export function DecklePlanner({ className }: { className?: string }) {
                     <span className="text-tx">
                       {r.id} · {r.planned.orders.map((o) => customer.get(o.id)).join(", ")}
                     </span>
-                    <span>{num(r.meters)} m of board</span>
+                    <span>
+                      {num(r.meters)} m of board
+                      {r.planned.trimMm - r.best.trimMm > 0 ? (
+                        <span className="text-green"> · saves {num(((r.planned.trimMm - r.best.trimMm) / 1000) * r.meters)} m²</span>
+                      ) : null}
+                    </span>
                   </p>
                   <Run label="Plan" combo={r.planned} />
                   <Run label="Best" combo={r.best} />
@@ -85,6 +114,9 @@ export function DecklePlanner({ className }: { className?: string }) {
               <span className="flex items-center gap-1.5"><span className="size-2 rounded-sm bg-red" />Trim</span>
             </p>
             <Insight tone="good">{story(d.trim)}</Insight>
+            <p className="text-xs text-mu">
+              Both plans run the same metres of board per run, so the saving is trim only. ₹ is margin never earned plus paper not won back as scrap, ₹{num(WASTE_PER_M2, 2)} per m². The Action centre prices the same idea across every run and shift.
+            </p>
           </>
         )}
       </WithPlant>

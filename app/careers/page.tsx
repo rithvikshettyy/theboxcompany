@@ -20,6 +20,7 @@ export default function CareersPage() {
       cta={{ title: "Don't see your role?", href: `mailto:${COMPANY.careersEmail}`, label: "Email us your CV" }}
     >
       <PageHero
+        position="center"
         title="Build boxes with us"
         lede="We hire operators, inspectors, planners and fitters. Most of our team learned the trade on our own line."
       />

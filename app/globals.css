@@ -255,3 +255,64 @@
 .services-carousel.flex-carousel:focus-visible {
   box-shadow: inset 0 0 0 2px var(--brand2);
 }
+
+/* Logo hover: "Box" becomes a mini box that hops onto "Company", bounces, hops back, and turns
+   into the word again. --dx (set by Wordmark) is the distance from "Box" to the middle of "Company". */
+.logo-word {
+  animation: logo-word 2.8s linear both;
+}
+.logo-box {
+  position: absolute;
+  left: 50%;
+  bottom: 0.04em;
+  width: 0.95em;
+  height: 0.95em;
+  margin-left: -0.475em;
+  pointer-events: none;
+  transform-origin: 50% 100%;
+  animation: logo-hop 2.8s linear both;
+}
+@keyframes logo-word {
+  0%, 3% { opacity: 1; transform: scale(1); }
+  8%, 92% { opacity: 0; transform: scale(0.4); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes logo-hop {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.2); animation-timing-function: ease-out; }
+  6% { opacity: 1; transform: translate(0, 0) scale(1.1, 0.85); }
+  10% { opacity: 1; transform: translate(0, 0) scale(1, 1); animation-timing-function: ease-out; }
+  19% { transform: translate(calc(var(--dx) * 0.5), -1.9em) rotate(-14deg); animation-timing-function: ease-in; }
+  28% { transform: translate(var(--dx), -0.8em) rotate(0) scale(1, 1); }
+  30% { transform: translate(var(--dx), -0.8em) scale(1.2, 0.8); animation-timing-function: ease-out; }
+  38% { transform: translate(var(--dx), -1.5em) scale(0.95, 1.08); animation-timing-function: ease-in; }
+  45% { transform: translate(var(--dx), -0.8em) scale(1, 1); }
+  46.5% { transform: translate(var(--dx), -0.8em) scale(1.15, 0.85); animation-timing-function: ease-out; }
+  52% { transform: translate(var(--dx), -1.2em) scale(0.97, 1.05); animation-timing-function: ease-in; }
+  57% { transform: translate(var(--dx), -0.8em) scale(1, 1); }
+  58% { transform: translate(var(--dx), -0.8em) scale(1.1, 0.9); animation-timing-function: ease-out; }
+  62% { transform: translate(var(--dx), -1em) scale(1, 1); animation-timing-function: ease-in; }
+  65% { transform: translate(var(--dx), -0.8em) scale(1.05, 0.95); }
+  68% { transform: translate(var(--dx), -0.8em) scale(1, 1); animation-timing-function: ease-out; }
+  77% { transform: translate(calc(var(--dx) * 0.5), -1.9em) rotate(14deg); animation-timing-function: ease-in; }
+  86% { transform: translate(0, 0) rotate(0) scale(1.2, 0.8); animation-timing-function: ease-out; }
+  90% { opacity: 1; transform: translate(0, 0) scale(1, 1); }
+  93% { opacity: 1; transform: translate(0, 0) scale(1, 1); animation-timing-function: ease-in; }
+  100% { opacity: 0; transform: translate(0, 0) scale(0.2); }
+}
+
+/* Printing the planner: only the plain schedule table comes out, on white. */
+.print-only {
+  display: none;
+}
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  body,
+  [data-theme="light"] {
+    background: #fff !important;
+  }
+}

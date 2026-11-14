@@ -6,10 +6,12 @@ import { cn } from "@/lib/utils";
 
 export const VIEWS = [
   { href: "/dashboard", label: "Overview" },
+  { href: "/dashboard/orders", label: "Orders" },
   { href: "/dashboard/production", label: "Production" },
   { href: "/dashboard/materials", label: "Materials" },
   { href: "/dashboard/quality", label: "Quality" },
-  { href: "/dashboard/orders", label: "Orders" },
+  { href: "/dashboard/planner", label: "Planner" },
+  { href: "/dashboard/copilot", label: "Copilot" },
 ] as const;
 
 /** Views that follow the shift and period tabs; the rest are "as of this morning". */
@@ -20,7 +22,7 @@ export function DashNav({ className }: { className?: string }) {
   const path = usePathname();
   return (
     <nav aria-label="Dashboard views" className={className}>
-      <ul className="flex gap-1">
+      <ul className="flex gap-2 xl:gap-3">
         {VIEWS.map((v) => {
           const current = path === v.href;
           return (

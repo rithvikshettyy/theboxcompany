@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BadgePercent, FlaskConical, Layers, PackageOpen, Truck, type LucideIcon } from "lucide-react";
 import { OPS } from "@/lib/assumptions";
-import { inr, num, pct } from "@/lib/format";
+import { inr, num, pct, wt } from "@/lib/format";
 import { materials, orders, quality } from "@/lib/ops";
 import { cn } from "@/lib/utils";
 
@@ -16,7 +16,7 @@ function items(): Item[] {
   const out: Item[] = [];
   const fail = q.alerts.find((a) => a.level === "fail");
   if (fail) out.push({ icon: FlaskConical, title: `${q.fails} quality fails`, sub: `${fail.test} on ${fail.where.split(" · ")[1] ?? fail.where}`, chip: "Hold", level: "loss", value: fail.measured, href: "/dashboard/quality" });
-  for (const g of m.short) out.push({ icon: Layers, title: `${g.name.split(",")[0]} running short`, sub: `${num(g.coverDays, 1)} days in store`, chip: "Reorder", level: "loss", value: `${num(-g.gap)} t`, href: "/dashboard/materials" });
+  for (const g of m.short) out.push({ icon: Layers, title: `${g.name.split(",")[0]} running short`, sub: `${num(g.coverDays, 1)} days in store`, chip: "Reorder", level: "loss", value: `${wt(-g.gap)}`, href: "/dashboard/materials" });
   if (o.lowMargin[0]) out.push({ icon: BadgePercent, title: `${o.lowMargin.length} orders under ${OPS.marginFloorPct}% margin`, sub: `Worst: ${o.lowMargin[0].customer}`, chip: "Requote", level: "loss", value: pct(o.lowMargin[0].marginPct), href: "/dashboard/orders#margins" });
   const old = o.pending.filter((p) => p.days >= 4);
   if (old.length) out.push({ icon: PackageOpen, title: `${old.length} dispatches waiting 4+ days`, sub: `Oldest ${o.oldestDays} days`, chip: "Chase", level: "watch", value: inr(old.reduce((s, p) => s + p.value, 0)), href: "/dashboard/orders#aging" });

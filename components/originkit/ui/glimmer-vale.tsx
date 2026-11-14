@@ -1414,7 +1414,7 @@ export default function GlimmerVale(props: GlimmerValeProps) {
 
             const { w: W, h: H } = sizeRef.current
             if (W < 2 || H < 2) return
-            const dpr = Math.min(2, window.devicePixelRatio || 1)
+            const dpr = Math.min(1, window.devicePixelRatio || 1) // capped at 1 for speed: the meadow is soft, so full resolution is wasted GPU work
             const cw = Math.round(W * dpr), ch = Math.round(H * dpr)
             if (canvas.width !== cw || canvas.height !== ch || !scene || scene.w !== cw || scene.h !== ch) {
                 canvas.width = cw

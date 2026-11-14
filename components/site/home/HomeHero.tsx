@@ -14,11 +14,11 @@ export function HomeHero() {
       {/* A light darkening at the top, behind the headline in the sky. */}
       <div aria-hidden="true" className="absolute inset-x-0 top-0 h-2/5 bg-gradient-to-b from-night/60 to-transparent" />
 
-      <div className="absolute inset-x-5 top-[18vh] z-10 flex flex-col items-center gap-6 text-center lg:inset-x-auto lg:top-[26vh] lg:left-[max(2rem,calc(50vw-30rem))] lg:max-w-[min(46vw,40rem)] lg:items-start lg:text-left">
+      <div className="absolute inset-x-5 top-[18vh] z-10 mx-auto flex max-w-3xl flex-col items-center gap-6 text-center lg:top-[26vh]">
         <h1 id="hero-title" className="display text-xl text-balance text-tx sm:text-2xl">
           {COMPANY.tagline}
         </h1>
-        <div className="flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+        <div className="flex flex-wrap items-center justify-center gap-3">
           <a
             href="#made"
             className="inline-flex h-12 items-center gap-2 rounded-full bg-paper px-6 text-sm font-medium text-night transition-colors duration-150 hover:bg-white"

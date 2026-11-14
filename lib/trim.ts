@@ -1,4 +1,4 @@
-import { EDGE, MAX_OUTS, ORDERS, P, PLAN_RUNS, REELS } from "./assumptions";
+import { EDGE, MAX_OUTS, OPS, ORDERS, P, PLAN_RUNS, REELS, WASTE_PER_M2 } from "./assumptions";
 import type { Combo, Order, TrimPlan } from "./types";
 
 const byId = new Map(ORDERS.map((o) => [o.id, o]));
@@ -85,4 +85,26 @@ export function trimPlan(): TrimPlan {
     plannedPct: weighted((r) => r.planned),
     bestPct: weighted((r) => r.best),
   };
+}
+
+export type TrimSavings = {
+  /** Board edge that stops being cut off and thrown away, m², over the plan's runs. */
+  savedM2: number;
+  /** The same board in kg of paper-and-board. */
+  savedKg: number;
+  /** ₹ a day the plan's runs win back: margin never earned plus paper not recovered, per m². */
+  rupeesPerDay: number;
+  /** Saved m² for each run, in plan order. */
+  byRun: { id: string; savedM2: number }[];
+};
+
+/**
+ * What the best pairing saves against the planner's, run by run. A run's trim is a strip the length
+ * of its board; the saving is the difference in strip width times the metres run. Metres per run
+ * are held the same in both plans, so this is a like-for-like comparison of trim only.
+ */
+export function trimSavings(plan: TrimPlan): TrimSavings {
+  const byRun = plan.runs.map((r) => ({ id: r.id, savedM2: ((r.planned.trimMm - r.best.trimMm) / 1000) * r.meters }));
+  const savedM2 = byRun.reduce((s, r) => s + r.savedM2, 0);
+  return { savedM2, savedKg: savedM2 * OPS.boardKgPerM2, rupeesPerDay: savedM2 * WASTE_PER_M2, byRun };
 }

@@ -29,7 +29,7 @@ export function blendTheme(stops: ThemeStop[], vh: number): number {
 }
 
 /** Where text colours flip: a narrow band where the surface passes mid-grey, so low contrast lasts only a few px of scroll. */
-export const INK_BAND = { from: 0.47, to: 0.53 } as const;
+export const INK_BAND = { from: 0.42, to: 0.58 } as const;
 
 /**
  * Ink (text, accents) for a given background darkness. The background glides; ink switches

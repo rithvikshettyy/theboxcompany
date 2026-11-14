@@ -1,14 +1,31 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import { ArrowDownRight, ArrowUpRight, CircleAlert, CircleCheck, ListChecks, SlidersHorizontal } from "lucide-react";
+import { ErrorState } from "@/components/ui/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
-import { inr, num, pct } from "@/lib/format";
+import { inr, pct, wt } from "@/lib/format";
 import { production } from "@/lib/ops";
+import { greetingFor, plantClock } from "@/lib/plantTime";
 import { SCOPE_LABEL } from "@/lib/scope";
 import { leakStory } from "@/lib/story";
 import { usePlant } from "../PlantProvider";
 import { useScope } from "../ScopeProvider";
 import { useSimulator } from "../SimulatorProvider";
+
+/** Welcome line from the plant clock. Rendered after mount so server and client markup match. */
+function Welcome({ name }: { name: string }) {
+  const greeting = useSyncExternalStore(
+    () => () => {},
+    () => greetingFor(plantClock(Date.now()).hour),
+    () => null,
+  );
+  return (
+    <p className="min-h-6 text-lg font-medium text-tx">
+      {greeting ? `${greeting}, welcome ${name}!` : null}
+    </p>
+  );
+}
 
 /** The plan card on the right of the hero: tinted glass, with two faded cards stacked behind. */
 function PlanCard({ tons, target, ofTarget, shifts }: { tons: number; target: number; ofTarget: number; shifts: number }) {
@@ -28,11 +45,11 @@ function PlanCard({ tons, target, ofTarget, shifts }: { tons: number; target: nu
           <span className="text-xl text-tx tabular-nums">{pct(ofTarget * 100, 0)}</span>
         </p>
         <p className="text-center text-2xl text-tx tabular-nums">
-          {num(tons)} t <span className="text-mu">/ {num(target)} t</span>
+          {wt(tons)} <span className="text-mu">/ {wt(target)}</span>
         </p>
         <p className="mx-auto inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs text-tx">
           {onTrack ? <CircleCheck aria-hidden="true" className="size-3.5" /> : <CircleAlert aria-hidden="true" className="size-3.5" />}
-          {onTrack ? "On track" : `${num(target - tons)} t behind plan`}
+          {onTrack ? "On track" : `${wt(target - tons)} behind plan`}
         </p>
       </div>
     </div>
@@ -46,6 +63,13 @@ export function OverviewHero({ className }: { className?: string }) {
   const { apply } = useSimulator();
   const label = SCOPE_LABEL[scope].long;
 
+  if (plant.status === "error") {
+    return (
+      <section className={className}>
+        <ErrorState message={plant.message} onRetry={plant.retry} />
+      </section>
+    );
+  }
   if (plant.status !== "ready") {
     return (
       <section aria-busy="true" className={className}>
@@ -65,6 +89,7 @@ export function OverviewHero({ className }: { className?: string }) {
     <section aria-labelledby="hero-title" className={className}>
       <div className="grid items-center gap-10 lg:grid-cols-[1fr_auto]">
         <div className="flex flex-col gap-4">
+          <Welcome name="Rithvik" />
           <p className="flex flex-wrap items-center gap-x-2 text-sm text-mu">
             Profit leak · {label}
             <span className="inline-flex items-center gap-1 tabular-nums">

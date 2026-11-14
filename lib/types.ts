@@ -134,6 +134,8 @@ export type Feeder = { id: "boiler" | "glue"; label: string; node: NodeId; lostM
 
 export type Rec = {
   id: "trim" | "reels" | "smed" | "rejects";
+  /** The operational problem in one sentence, with the numbers behind it. */
+  problem: string;
   title: string;
   body: string;
   owner: string;

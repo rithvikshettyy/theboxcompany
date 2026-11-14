@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { Factory, Layers, Scissors, Truck, type LucideIcon } from "lucide-react";
+import { ErrorState } from "@/components/ui/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { OPS } from "@/lib/assumptions";
-import { num, pct } from "@/lib/format";
+import { num, pct, wt } from "@/lib/format";
 import { materials, orders, production } from "@/lib/ops";
 import { cn } from "@/lib/utils";
 import type { PlantData } from "@/lib/types";
@@ -27,9 +28,9 @@ function focus(d: PlantData): Focus[] {
   const o = orders();
   const waste = p.trimPct + p.dryEndPct;
   return [
-    { title: ["Production", "& target"], icon: Factory, value: `${num(p.tons)} t`, of: `${num(p.targetTons)} t`, good: p.ofTarget >= 0.95, status: `${pct(p.ofTarget * 100, 0)} of plan`, rest: `${num(p.goodM2)} m²`, href: "/dashboard/production" },
+    { title: ["Production", "& target"], icon: Factory, value: `${wt(p.tons)}`, of: `${wt(p.targetTons)}`, good: p.ofTarget >= 0.95, status: `${pct(p.ofTarget * 100, 0)} of plan`, rest: `${num(p.goodM2)} m²`, href: "/dashboard/production" },
     { title: ["Wastage", "trim + dry end"], icon: Scissors, value: pct(waste), of: pct(OPS.wastageTargetPct), good: waste <= OPS.wastageTargetPct, status: `${pct(waste - OPS.wastageTargetPct)} over`, rest: `trim ${pct(p.trimPct)}`, href: "/dashboard/production#waste" },
-    { title: ["Reel stock", "& order load"], icon: Layers, value: `${num(m.stock)} t`, of: `${num(m.load)} t`, good: m.short.length === 0, status: m.short.length ? `${m.short.length} grade short` : "All grades covered", rest: `${num(m.coverDays, 1)} days cover`, href: "/dashboard/materials" },
+    { title: ["Reel stock", "& order load"], icon: Layers, value: `${wt(m.stock)}`, of: `${wt(m.load)}`, good: m.short.length === 0, status: m.short.length ? `${m.short.length} grade short` : "All grades covered", rest: `${num(m.coverDays, 1)} days cover`, href: "/dashboard/materials" },
     { title: ["Dispatch", "readiness"], icon: Truck, value: `${o.readyCount}`, of: `${o.dispatch.length} orders`, good: o.readyPct >= 90, status: `${pct(o.readyPct, 0)} ready`, rest: "due today", href: "/dashboard/orders" },
   ];
 }
@@ -37,6 +38,13 @@ function focus(d: PlantData): Focus[] {
 /** Four focus cards, two by two: value against target, with a status line in words and colour. */
 export function FocusCards({ className }: { className?: string }) {
   const plant = usePlant();
+  if (plant.status === "error") {
+    return (
+      <div className={className}>
+        <ErrorState message={plant.message} onRetry={plant.retry} />
+      </div>
+    );
+  }
   return (
     <ul className={cn("grid grid-cols-1 gap-4 sm:grid-cols-2", className)}>
       {plant.status === "ready"

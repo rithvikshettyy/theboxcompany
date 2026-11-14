@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Insight } from "@/components/ui/insight";
 import { OPS } from "@/lib/assumptions";
-import { inr, num, pct } from "@/lib/format";
+import { inr, num, pct, wt, wtParts } from "@/lib/format";
 import { materials } from "@/lib/ops";
 import { FINISHED_GOODS } from "@/lib/records";
 import { cn } from "@/lib/utils";
@@ -21,13 +21,13 @@ export function MaterialsView() {
       <PageIntro title="Materials" lede="Paper on the reel stand against the orders booked ahead, what is in store, and the mills that supply it. As of 06:00 today." />
       <StatRow
         stats={[
-          { label: "Reel stock", value: num(m.stock), unit: "t", note: `${num(m.coverDays, 1)} days of booked orders · ${inr(m.stockValue)} at cost` },
-          { label: "Pending order load", value: num(m.load), unit: "t", note: `Paper for the next ${OPS.bookedDays} booked days` },
+          { label: "Reel stock", value: wtParts(m.stock).amount, unit: wtParts(m.stock).unit, note: `${num(m.coverDays, 1)} days of booked orders · ${inr(m.stockValue)} at cost` },
+          { label: "Pending order load", value: wtParts(m.load).amount, unit: wtParts(m.load).unit, note: `Paper for the next ${OPS.bookedDays} booked days` },
           {
             label: "Grades short",
             value: m.short.length,
             tone: m.short.length ? "loss" : "good",
-            note: m.short.length ? m.short.map((g) => `${g.name.split(",")[0]} ${num(-g.gap)} t`).join(" · ") : "Every grade covered",
+            note: m.short.length ? m.short.map((g) => `${g.name.split(",")[0]} ${wt(-g.gap)}`).join(" · ") : "Every grade covered",
           },
           {
             label: "Starch cover",
@@ -52,10 +52,10 @@ export function MaterialsView() {
                 <span className="block h-2 rounded-full bg-amber" style={{ width: `${(g.load / max) * 100}%` }} />
               </div>
               <p className="text-sm tabular-nums md:text-right">
-                <span className="text-tx">{num(g.tonnes)} + {num(g.incoming)} t</span>
-                <span className="text-mu"> vs {num(g.load)} t</span>
+                <span className="text-tx">{num(g.tonnes)} + {wt(g.incoming)}</span>
+                <span className="text-mu"> vs {wt(g.load)}</span>
                 <span className="block">
-                  <Tag tone={g.gap < 0 ? "loss" : "good"}>{g.gap < 0 ? `Short ${num(-g.gap)} t` : `Spare ${num(g.gap)} t`}</Tag>
+                  <Tag tone={g.gap < 0 ? "loss" : "good"}>{g.gap < 0 ? `Short ${wt(-g.gap)}` : `Spare ${wt(g.gap)}`}</Tag>
                 </span>
               </p>
             </li>
@@ -67,7 +67,7 @@ export function MaterialsView() {
           <span className="flex items-center gap-1.5"><span className="size-2 rounded-sm bg-amber" />Needed by booked orders</span>
         </p>
         {worst && vendor ? (
-          <Insight tone="loss">{`${worst.name.split(",")[0]} runs out first: ${num(worst.coverDays, 1)} days in store and nothing due from ${vendor.name} for ${vendor.nextIn} days (${pct(vendor.onTimePct, 0)} on time). Order ${num(-worst.gap)} t from a second mill this week.`}</Insight>
+          <Insight tone="loss">{`${worst.name.split(",")[0]} runs out first: ${num(worst.coverDays, 1)} days in store and nothing due from ${vendor.name} for ${vendor.nextIn} days (${pct(vendor.onTimePct, 0)} on time). Order ${wt(-worst.gap)} from a second mill this week.`}</Insight>
         ) : null}
       </Card>
 
@@ -105,7 +105,7 @@ export function MaterialsView() {
                   <td className={cn(td, "text-right tabular-nums")}>{v.leadDays} d</td>
                   <td className={cn(td, "text-right")}><Tag tone={toneFor(v.onTimePct, 90, "higher", 5)}>{pct(v.onTimePct, 0)}</Tag></td>
                   <td className={cn(td, "text-right tabular-nums")}>{pct(v.rejectPct)}</td>
-                  <td className={cn(td, "pr-0 text-right tabular-nums")}>{when(v.nextIn)}<span className="block text-xs text-mu">{num(v.openPoTonnes)} t on order</span></td>
+                  <td className={cn(td, "pr-0 text-right tabular-nums")}>{when(v.nextIn)}<span className="block text-xs text-mu">{wt(v.openPoTonnes)} on order</span></td>
                 </tr>
               ))}
             </tbody>

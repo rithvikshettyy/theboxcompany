@@ -17,7 +17,7 @@ export function ScopeTabs({ className }: { className?: string }) {
       <div
         role="group"
         aria-label="Scope: every number on the page follows this"
-        className="grid grid-cols-6 gap-1 md:inline-flex md:items-center"
+        className="grid grid-cols-6 gap-1.5 md:inline-flex md:items-center md:gap-2"
       >
         {SCOPES.map((s, i) => {
           const active = s === scope;
@@ -25,7 +25,7 @@ export function ScopeTabs({ className }: { className?: string }) {
           return (
             <Fragment key={s}>
               {i === SHIFT_SCOPE_COUNT ? (
-                <span aria-hidden="true" className="mx-1 hidden h-4 w-px bg-line2 md:block" />
+                <span aria-hidden="true" className="mx-2 hidden h-5 w-px bg-line2 md:block" />
               ) : null}
               <button
                 type="button"

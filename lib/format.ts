@@ -50,3 +50,15 @@ export function k(value: number): string {
   const text = (value / 1000).toFixed(1).replace(/\.0$/, "");
   return `${text.replace("-", MINUS)}k`;
 }
+
+/** Weight split for stat tiles. Input is tons; under 1 ton it reads in kg: wtParts(0.45) → 450 kg. */
+export function wtParts(tons: number, decimals = 0): { amount: string; unit: string } {
+  if (Math.abs(tons) < 1) return { amount: num(Math.round(tons * 1000)), unit: "kg" };
+  return { amount: num(tons, decimals), unit: "tons" };
+}
+
+/** wt(12.4) → "12 tons", wt(0.45) → "450 kg". Input is tons. */
+export function wt(tons: number, decimals = 0): string {
+  const { amount, unit } = wtParts(tons, decimals);
+  return `${amount} ${unit}`;
+}
